@@ -136,10 +136,14 @@ class BaseTranslator:
                 "role": "user",
                 "content": (
                     "You are a professional, authentic machine translation engine. "
-                    "Only Output the translated text, do not include any other text."
+                    "You only output the translated text. Do not include any other text or explanations."
                     "\n\n"
                     f"Translate the following markdown source text to {self.lang_out}. "
-                    "Keep the formula notation {v*} unchanged. "
+                    "The text contains formula notations like {v1}, {v2}, etc. These are placeholders for mathematical formulas. "
+                    "**You must keep these formula notations completely unchanged in the translation.** Do not translate them, do not add spaces around them, and keep them in the same relative order."
+                    "\n\n"
+                    "For example, if the source text is 'The equation is {v1} and the result is {v2}.', and the target language is French, the output should be 'L'équation est {v1} et le résultat est {v2}.'"
+                    "\n\n"
                     "Output translation directly without any additional text."
                     "\n\n"
                     f"Source Text: {text}"
