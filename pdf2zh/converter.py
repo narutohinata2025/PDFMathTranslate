@@ -1,5 +1,6 @@
 import concurrent.futures
 import logging
+import os
 import re
 import unicodedata
 from enum import Enum
@@ -165,6 +166,16 @@ class TranslateConverter(PDFConverterEx):
                 self.translator = translator(lang_in, lang_out, service_model, envs=envs, prompt=prompt, ignore_cache=ignore_cache)
         if not self.translator:
             raise ValueError("Unsupported translation service")
+
+        # Load custom fonts for Indian languages
+        font_map = {
+            "hi": "NotoSansDevanagari.ttf",
+        }
+        if self.translator.lang_out.lower() in font_map:
+            font_path = os.path.join(os.path.dirname(__file__), "fonts", font_map[self.translator.lang_out.lower()])
+            if os.path.exists(font_path):
+                self.noto = Font(fontfile=font_path)
+                self.noto_name = self.noto.name
 
     def receive_layout(self, ltpage: LTPage):
         # 段落
@@ -375,7 +386,7 @@ class TranslateConverter(PDFConverterEx):
         # 根据目标语言获取默认行距
         LANG_LINEHEIGHT_MAP = {
             "zh-cn": 1.4, "zh-tw": 1.4, "zh-hans": 1.4, "zh-hant": 1.4, "zh": 1.4,
-            "ja": 1.1, "ko": 1.2, "en": 1.2, "ar": 1.0, "ru": 0.8, "uk": 0.8, "ta": 0.8
+            "ja": 1.1, "ko": 1.2, "en": 1.2, "ar": 1.0, "ru": 0.8, "uk": 0.8, "ta": 0.8, "hi": 1.2
         }
         default_line_height = LANG_LINEHEIGHT_MAP.get(self.translator.lang_out.lower(), 1.1) # 小语种默认1.1
         _x, _y = 0, 0
